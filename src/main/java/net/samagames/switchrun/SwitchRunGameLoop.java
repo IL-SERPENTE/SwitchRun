@@ -13,7 +13,6 @@ import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SwitchRunGameLoop extends RunBasedGameLoop
 {
@@ -63,7 +62,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
         for (SurvivalTeam team : teamGame.getTeams())
         {
-            if (this.random.nextInt(10) > 2)
+            // TESTS ONLY, AFTER 35%
+            if (this.random.nextInt(100) > 0)
             {
                 this.plugin.getServer().broadcastMessage("Team '" + team.getChatColor().name() + "' will be rolled.");
 
@@ -73,9 +73,12 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                     if (!team.getPlayersUUID().get(teamMember))
                         players.add(teamMember);
 
-                Collections.shuffle(players, this.random);
+                if (players.isEmpty())
+                    continue;
 
                 this.plugin.getServer().broadcastMessage(players.size() + " players in the '" + team.getChatColor().name() + "'.");
+
+                Collections.shuffle(players, this.random);
 
                 if (players.isEmpty() || players.size() == 1)
                     continue;
