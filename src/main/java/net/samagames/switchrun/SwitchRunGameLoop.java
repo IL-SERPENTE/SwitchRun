@@ -67,8 +67,10 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             {
                 this.plugin.getServer().broadcastMessage("Team '" + team.getChatColor().name() + "' will be rolled.");
 
-                ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
+                ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> !team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
                 Collections.shuffle(players, this.random);
+
+                this.plugin.getServer().broadcastMessage(players.size() + " players in the '" + team.getChatColor().name() + "'.");
 
                 if (players.isEmpty() || players.size() == 1)
                     continue;
