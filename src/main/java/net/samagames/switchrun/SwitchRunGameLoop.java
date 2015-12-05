@@ -61,7 +61,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
         for (SurvivalTeam team : teamGame.getTeams())
         {
-            if (this.random.nextInt(100) > 50)
+            if (this.random.nextInt(10) > 2)
             {
                 ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
                 Collections.shuffle(players, this.random);
