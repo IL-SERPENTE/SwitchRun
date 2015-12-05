@@ -56,6 +56,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     private void rollTeams()
     {
+        this.plugin.getServer().broadcastMessage("Rolling teams...");
+
         SurvivalTeamGame teamGame = ((SurvivalTeamGame<SurvivalGameLoop>) this.game);
         ArrayList<UUID> toMove = new ArrayList<>();
 
@@ -63,6 +65,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             if (this.random.nextInt(10) > 2)
             {
+                this.plugin.getServer().broadcastMessage("Team '" + team.getChatColor().name() + "' will be rolled.");
+
                 ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
                 Collections.shuffle(players, this.random);
 
@@ -70,10 +74,13 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                     continue;
 
                 toMove.add(players.get(0));
+                this.plugin.getServer().broadcastMessage("Selected player '" + this.plugin.getServer().getPlayer(toMove.get((toMove.size() - 1))).getName() + "' to be moved.");
             }
         }
 
         Collections.shuffle(toMove, this.random);
+
+        this.plugin.getServer().broadcastMessage(toMove.size() + " players selected.");
 
         if (toMove.size() % 2 != 0)
             toMove.remove(0);
@@ -82,6 +89,10 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             UUID one = toMove.get(0);
             UUID two = toMove.get(1);
+
+            this.plugin.getServer().broadcastMessage("---");
+            this.plugin.getServer().broadcastMessage("Moving player one '" + this.plugin.getServer().getPlayer(one).getName() + "'...");
+            this.plugin.getServer().broadcastMessage("Moving player two '" + this.plugin.getServer().getPlayer(two).getName() + "'...");
 
             SurvivalTeam oneTeam = ((SurvivalPlayer) this.game.getPlayer(one)).getTeam();
             SurvivalTeam twoTeam = ((SurvivalPlayer) this.game.getPlayer(two)).getTeam();
