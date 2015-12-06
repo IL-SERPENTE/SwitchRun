@@ -57,6 +57,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
     {
         this.nextEvent = new TimedEvent(14, 0, "Duel", ChatColor.RED, true, () ->
         {
+            this.game.disableDamages();
+
             ArrayList<SurvivalTeam> teams = new ArrayList<>(((SurvivalTeamGame) this.game).getTeams());
             ArrayList<Location> spawns = new ArrayList<>(this.game.getSpawns());
 
@@ -118,11 +120,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             if (this.random.nextInt(100) > 35)
             {
-                ArrayList<UUID> players = new ArrayList<>();
-
-                for (UUID teamMember : team.getPlayersUUID().keySet())
-                    if (!team.getPlayersUUID().get(teamMember))
-                        players.add(teamMember);
+                ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> !team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
 
                 if (players.isEmpty())
                     continue;
