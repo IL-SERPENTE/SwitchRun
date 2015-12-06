@@ -6,6 +6,7 @@ import net.samagames.survivalapi.game.SurvivalPlayer;
 import net.samagames.survivalapi.game.SurvivalTeam;
 import net.samagames.survivalapi.game.types.SurvivalTeamGame;
 import net.samagames.survivalapi.game.types.run.RunBasedGameLoop;
+import net.samagames.survivalapi.utils.TimedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -84,7 +85,14 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                     continue;
 
                 toMove.add(players.get(0));
+
+                if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3)
+                    toMove.add(players.get(1));
+
                 this.plugin.getServer().broadcastMessage("Selected player '" + this.plugin.getServer().getPlayer(toMove.get((toMove.size() - 1))).getName() + "' to be moved.");
+
+                if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3)
+                    this.plugin.getServer().broadcastMessage("Selected player '" + this.plugin.getServer().getPlayer(toMove.get((toMove.size() - 2))).getName() + "' to be moved.");
             }
         }
 
