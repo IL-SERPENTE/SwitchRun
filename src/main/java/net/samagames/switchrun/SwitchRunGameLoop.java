@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SwitchRunGameLoop extends RunBasedGameLoop
 {
@@ -48,12 +49,59 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             SamaGamesAPI.get().getGameManager().setMaxReconnectTime(-1);
 
             this.rollTeams();
+            this.createPreTeleportationEvent();
+        });
+    }
+
+    public void createPreTeleportationEvent()
+    {
+        this.nextEvent = new TimedEvent(14, 0, "Duel", ChatColor.RED, true, () ->
+        {
+            ArrayList<SurvivalTeam> teams = new ArrayList<>(((SurvivalTeamGame) this.game).getTeams());
+            ArrayList<Location> spawns = new ArrayList<>(this.game.getSpawns());
+
+            while (!teams.isEmpty())
+            {
+                Location spawn = spawns.get(this.random.nextInt(spawns.size()));
+                spawns.remove(spawn);
+
+                ArrayList<UUID> players = teams.get(0).getPlayersUUID().keySet().stream().filter(player -> !teams.get(0).getPlayersUUID().get(player)).collect(Collectors.toCollection(ArrayList::new));
+
+                teams.remove(0);
+
+                if (!teams.isEmpty())
+                {
+                    players.addAll(teams.get(0).getPlayersUUID().keySet().stream().filter(player -> !teams.get(0).getPlayersUUID().get(player)).collect(Collectors.toList()));
+                    teams.remove(0);
+                }
+
+                for (UUID player : players)
+                    Bukkit.getPlayer(player).teleport(spawn);
+            }
+
+            this.createDuelEvent();
+        });
+    }
+
+    public void createDuelEvent()
+    {
+        this.nextEvent = new TimedEvent(0, 30, "PvP activé", ChatColor.RED, false, () ->
+        {
+            this.game.enableDamages();
+            this.game.enablePVP();
+
+            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("C'est l'heure du du-du-du-duel !", true);
+
             this.createTeleportationEvent();
         });
     }
 
+
     public void createTeleportationEvent()
     {
+        this.game.disableDamages();
+        this.game.disablePVP();
+
         super.createTeleportationEvent();
         this.nextEvent = this.nextEvent.copy(5, 0);
     }
