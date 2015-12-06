@@ -35,16 +35,16 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Les équipes seront mélangées dans 14 minutes.", true);
             this.game.enableDamages();
 
-            this.createRollEvent(14, () -> this.createRollEvent(5, this::createTeleportationEvent));
+            this.createRollEvent();
         });
     }
 
-    public void createRollEvent(int time, Runnable callback)
+    public void createRollEvent()
     {
-        this.nextEvent = new TimedEvent(time, 0, "Mélange des équipes", ChatColor.YELLOW, () ->
+        this.nextEvent = new TimedEvent(14, 0, "Mélange des équipes", ChatColor.YELLOW, () ->
         {
             this.rollTeams();
-            callback.run();
+            this.createTeleportationEvent();
         });
     }
 
@@ -63,8 +63,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
         for (SurvivalTeam team : teamGame.getTeams())
         {
-            // TESTS ONLY, AFTER 35%
-            if (this.random.nextInt(100) > 0)
+            if (this.random.nextInt(100) > 50)
             {
                 this.plugin.getServer().broadcastMessage("Team '" + team.getChatColor().name() + "' will be rolled.");
 
@@ -81,12 +80,9 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
                 Collections.shuffle(players, this.random);
 
-                if (players.isEmpty() || players.size() == 1)
-                    continue;
-
                 toMove.add(players.get(0));
 
-                if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3)
+                if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3 && players.size() > 1)
                     toMove.add(players.get(1));
 
                 this.plugin.getServer().broadcastMessage("Selected player '" + this.plugin.getServer().getPlayer(toMove.get((toMove.size() - 1))).getName() + "' to be moved.");
