@@ -120,7 +120,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             twoPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10, 255));
             twoPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 10, 255));
 
-            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage(ChatColor.YELLOW + "Le joueur " + oneTeam.getChatColor() + onePlayer.getName() + ChatColor.YELLOW + " a échangé sa place avec le joueur " + twoTeam.getChatColor() + twoPlayer.getName() + ChatColor.YELLOW + ".", true;
+            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage(ChatColor.YELLOW + "Le joueur " + oneTeam.getChatColor() + onePlayer.getName() + ChatColor.YELLOW + " a échangé sa place avec le joueur " + twoTeam.getChatColor() + twoPlayer.getName() + ChatColor.YELLOW + ".", true);
 
             Collections.shuffle(toMove, this.random);
         }
