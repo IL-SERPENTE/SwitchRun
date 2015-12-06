@@ -65,6 +65,9 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                 Location spawn = spawns.get(this.random.nextInt(spawns.size()));
                 spawns.remove(spawn);
 
+                spawn.setX(spawn.getX() / 2);
+                spawn.setZ(spawn.getZ() / 2);
+
                 ArrayList<UUID> players = teams.get(0).getPlayersUUID().keySet().stream().filter(player -> !teams.get(0).getPlayersUUID().get(player)).collect(Collectors.toCollection(ArrayList::new));
 
                 teams.remove(0);
