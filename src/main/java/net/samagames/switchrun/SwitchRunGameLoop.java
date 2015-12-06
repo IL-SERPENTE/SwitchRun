@@ -1,5 +1,6 @@
 package net.samagames.switchrun;
 
+import net.samagames.api.SamaGamesAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.game.SurvivalGameLoop;
 import net.samagames.survivalapi.game.SurvivalPlayer;
@@ -30,7 +31,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
     @Override
     public void createDamageEvent()
     {
-        this.nextEvent = new TimedEvent(1, 0, "Dégats actifs", ChatColor.GREEN, () ->
+        this.nextEvent = new TimedEvent(1, 0, "Dégats actifs", ChatColor.GREEN, false, () ->
         {
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Les dégats sont désormais actifs.", true);
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Les équipes seront mélangées dans 14 minutes.", true);
@@ -42,8 +43,10 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     public void createRollEvent()
     {
-        this.nextEvent = new TimedEvent(14, 0, "Mélange des équipes", ChatColor.YELLOW, () ->
+        this.nextEvent = new TimedEvent(14, 0, "Mélange des équipes", ChatColor.YELLOW, true, () ->
         {
+            SamaGamesAPI.get().getGameManager().setMaxReconnectTime(-1);
+
             this.rollTeams();
             this.createTeleportationEvent();
         });
