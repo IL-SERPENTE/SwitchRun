@@ -7,11 +7,12 @@ import net.samagames.survivalapi.game.SurvivalTeam;
 import net.samagames.survivalapi.game.types.SurvivalTeamGame;
 import net.samagames.survivalapi.game.types.run.RunBasedGameLoop;
 import net.samagames.survivalapi.utils.TimedEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Server;
+import net.samagames.tools.GameUtils;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -56,17 +57,13 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     private void rollTeams()
     {
-        this.plugin.getServer().broadcastMessage("Rolling teams...");
-
         SurvivalTeamGame teamGame = ((SurvivalTeamGame<SurvivalGameLoop>) this.game);
         ArrayList<UUID> toMove = new ArrayList<>();
 
         for (SurvivalTeam team : teamGame.getTeams())
         {
-            if (this.random.nextInt(100) > 50)
+            if (this.random.nextInt(100) > 35)
             {
-                this.plugin.getServer().broadcastMessage("Team '" + team.getChatColor().name() + "' will be rolled.");
-
                 ArrayList<UUID> players = new ArrayList<>();
 
                 for (UUID teamMember : team.getPlayersUUID().keySet())
@@ -76,37 +73,29 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                 if (players.isEmpty())
                     continue;
 
-                this.plugin.getServer().broadcastMessage(players.size() + " players in the '" + team.getChatColor().name() + "'.");
-
                 Collections.shuffle(players, this.random);
 
                 toMove.add(players.get(0));
 
                 if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3 && players.size() > 1)
                     toMove.add(players.get(1));
-
-                this.plugin.getServer().broadcastMessage("Selected player '" + this.plugin.getServer().getPlayer(toMove.get((toMove.size() - 1))).getName() + "' to be moved.");
-
-                if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3)
-                    this.plugin.getServer().broadcastMessage("Selected player '" + this.plugin.getServer().getPlayer(toMove.get((toMove.size() - 2))).getName() + "' to be moved.");
             }
         }
 
         Collections.shuffle(toMove, this.random);
 
-        this.plugin.getServer().broadcastMessage(toMove.size() + " players selected.");
-
         if (toMove.size() % 2 != 0)
             toMove.remove(0);
+
+        GameUtils.broadcastSound(Sound.ENDERMAN_TELEPORT);
 
         while (!toMove.isEmpty())
         {
             UUID one = toMove.get(0);
-            UUID two = toMove.get(1);
+            Player onePlayer = Bukkit.getPlayer(one);
 
-            this.plugin.getServer().broadcastMessage("---");
-            this.plugin.getServer().broadcastMessage("Moving player one '" + this.plugin.getServer().getPlayer(one).getName() + "'...");
-            this.plugin.getServer().broadcastMessage("Moving player two '" + this.plugin.getServer().getPlayer(two).getName() + "'...");
+            UUID two = toMove.get(1);
+            Player twoPlayer = Bukkit.getPlayer(two);
 
             SurvivalTeam oneTeam = ((SurvivalPlayer) this.game.getPlayer(one)).getTeam();
             SurvivalTeam twoTeam = ((SurvivalPlayer) this.game.getPlayer(two)).getTeam();
@@ -120,11 +109,18 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             toMove.remove(one);
             toMove.remove(two);
 
-            Location oneLocation = Bukkit.getPlayer(one).getLocation();
-            Location twoLocation = Bukkit.getPlayer(two).getLocation();
+            Location oneLocation = onePlayer.getLocation();
+            Location twoLocation = twoPlayer.getLocation();
 
-            Bukkit.getPlayer(one).teleport(twoLocation);
-            Bukkit.getPlayer(two).teleport(oneLocation);
+            onePlayer.teleport(twoLocation);
+            twoPlayer.teleport(oneLocation);
+
+            onePlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10, 255));
+            onePlayer.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 10, 255));
+            twoPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10, 255));
+            twoPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 10, 255));
+
+            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage(ChatColor.YELLOW + "Le joueur " + oneTeam.getChatColor() + onePlayer.getName() + ChatColor.YELLOW + " a échangé sa place avec le joueur " + twoTeam.getChatColor() + twoPlayer.getName() + ChatColor.YELLOW + ".", true;
 
             Collections.shuffle(toMove, this.random);
         }
