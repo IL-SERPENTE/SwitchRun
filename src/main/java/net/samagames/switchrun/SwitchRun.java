@@ -12,7 +12,7 @@ public class SwitchRun extends JavaPlugin
     {
         int nb = SamaGamesAPI.get().getGameManager().getGameProperties().getOption("playersPerTeam", new JsonPrimitive(2)).getAsInt();
 
-        SamaGamesAPI.get().getGameManager().setMaxReconnectTime(20);
+        SamaGamesAPI.get().getGameManager().setMaxReconnectTime(15);
         SamaGamesAPI.get().getGameManager().registerGame(new RunBasedTeamGame<SwitchRunGameLoop>(this, "switchrun", "SwitchRun", "30 minutes pour surpasser les Patricks !", "≈", SwitchRunGameLoop.class, nb));
     }
 }
