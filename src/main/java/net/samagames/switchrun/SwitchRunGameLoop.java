@@ -81,7 +81,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                 }
 
                 for (UUID player : players)
-                    Bukkit.getPlayer(player).teleport(spawn.add((double) this.random.nextInt(10) - 5, 0.0D, (double) this.random.nextInt(10) - 5));
+                    if (Bukkit.getPlayer(player) != null)
+                        Bukkit.getPlayer(player).teleport(spawn.add((double) this.random.nextInt(10) - 5, 0.0D, (double) this.random.nextInt(10) - 5));
             }
 
             this.createDuelEvent();
@@ -104,7 +105,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     public void createTeleportationEvent()
     {
-        this.nextEvent = new TimedEvent(5, 0, "Téléportation", ChatColor.YELLOW, false, () ->
+        this.nextEvent = new TimedEvent(3, 0, "Téléportation", ChatColor.YELLOW, false, () ->
         {
             this.game.disableDamages();
             this.game.disablePVP();
@@ -167,6 +168,9 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
             Location oneLocation = onePlayer.getLocation();
             Location twoLocation = twoPlayer.getLocation();
+
+            oneLocation.getWorld().strikeLightningEffect(oneLocation);
+            twoLocation.getWorld().strikeLightningEffect(twoLocation);
 
             onePlayer.teleport(twoLocation);
             twoPlayer.teleport(oneLocation);
