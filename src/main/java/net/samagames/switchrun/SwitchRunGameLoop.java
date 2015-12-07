@@ -121,9 +121,10 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
         for (SurvivalTeam team : teamGame.getTeams())
         {
-            if (this.random.nextInt(100) > 35)
+            if (this.random.nextInt(100) > 25)
             {
                 ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> !team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
+                players.stream().filter(uuid -> Bukkit.getPlayer(uuid) == null).forEach(players::remove);
 
                 if (players.isEmpty())
                     continue;
