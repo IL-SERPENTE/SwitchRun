@@ -80,9 +80,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                     teams.remove(0);
                 }
 
-                for (UUID player : players)
-                    if (Bukkit.getPlayer(player) != null)
-                        Bukkit.getPlayer(player).teleport(spawn.add((double) this.random.nextInt(10) - 5, 0.0D, (double) this.random.nextInt(10) - 5));
+                players.stream().filter(player -> Bukkit.getPlayer(player) != null).forEach(player -> Bukkit.getPlayer(player).teleport(spawn.add((double) this.random.nextInt(20) - 10, 0.0D, (double) this.random.nextInt(20) - 10)));
             }
 
             this.createDuelEvent();
