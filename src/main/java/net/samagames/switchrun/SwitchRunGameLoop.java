@@ -55,7 +55,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     public void createPreTeleportationEvent()
     {
-        this.nextEvent = new TimedEvent(14, 0, "Duel", ChatColor.RED, true, () ->
+        this.nextEvent = new TimedEvent(5, 0, "Duel", ChatColor.RED, true, () ->
         {
             this.game.disableDamages();
 
@@ -81,7 +81,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
                 }
 
                 for (UUID player : players)
-                    Bukkit.getPlayer(player).teleport(spawn);
+                    Bukkit.getPlayer(player).teleport(spawn.add((double) this.random.nextInt(10) - 5, 0.0D, (double) this.random.nextInt(10) - 5));
             }
 
             this.createDuelEvent();
@@ -104,11 +104,15 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     public void createTeleportationEvent()
     {
-        this.game.disableDamages();
-        this.game.disablePVP();
+        this.nextEvent = new TimedEvent(5, 0, "Téléportation", ChatColor.YELLOW, false, () ->
+        {
+            this.game.disableDamages();
+            this.game.disablePVP();
 
-        super.createTeleportationEvent();
-        this.nextEvent = this.nextEvent.copy(5, 0);
+            super.createTeleportationEvent();
+            
+            this.nextEvent.run();
+        });
     }
 
     private void rollTeams()
