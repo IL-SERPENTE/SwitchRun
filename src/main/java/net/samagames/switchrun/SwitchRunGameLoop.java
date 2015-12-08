@@ -219,9 +219,11 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             for(double cercle = 0; cercle <= Math.PI*2; cercle += 0.6)
             {
-                double x = loc.getX() + Math.sin(cercle);
-                double z = loc.getZ() + Math.cos(cercle);
-                ParticleEffect.PORTAL.display(new Vector(0,0,0), 0.5F, new Location(loc.getWorld(), x,y,z), 50);
+                double sin = Math.sin(cercle);
+                double cos = Math.cos(cercle);
+                double x = loc.getX() + sin;
+                double z = loc.getZ() + cos;
+                ParticleEffect.PORTAL.display(new Vector(-sin,0,-cos), 0.5F, new Location(loc.getWorld(), x,y,z), 50);
             }
         }
 
