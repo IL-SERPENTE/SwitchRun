@@ -196,8 +196,10 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             twoLocation.getWorld().strikeLightningEffect(twoLocation);
 
             //Particules
-            effect(twoLocation);
-            effect(oneLocation);
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                effect(twoLocation);
+                effect(oneLocation);
+            });
 
             onePlayer.teleport(twoLocation);
             twoPlayer.teleport(oneLocation);
@@ -209,13 +211,14 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage(ChatColor.YELLOW + "Le joueur " + oneTeam.getChatColor() + onePlayer.getName() + ChatColor.YELLOW + " a échangé sa place avec le joueur " + twoTeam.getChatColor() + twoPlayer.getName() + ChatColor.YELLOW + ".", true);
 
-            Collections.shuffle(toMove, this.random);
+            //useless
+            //Collections.shuffle(toMove, this.random);
         }
     }
 
     private void effect(Location loc)
     {
-        for(double y = loc.getY(); y <= loc.getY()+1.7; y += 0.3)
+        for(double y = loc.getY(); y <= loc.getY()+1.7; y += 0.4)
         {
             for(double cercle = 0; cercle <= Math.PI*2; cercle += 0.6)
             {
