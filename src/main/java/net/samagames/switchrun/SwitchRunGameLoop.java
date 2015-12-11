@@ -3,30 +3,41 @@ package net.samagames.switchrun;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.game.SurvivalGameLoop;
-import net.samagames.survivalapi.game.SurvivalPlayer;
 import net.samagames.survivalapi.game.SurvivalTeam;
 import net.samagames.survivalapi.game.types.SurvivalTeamGame;
 import net.samagames.survivalapi.game.types.run.RunBasedGameLoop;
 import net.samagames.survivalapi.utils.TimedEvent;
 import net.samagames.tools.GameUtils;
+import net.samagames.tools.ParticleEffect;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SwitchRunGameLoop extends RunBasedGameLoop
 {
-    private final Random random;
+    private Random random;
 
     public SwitchRunGameLoop(JavaPlugin plugin, Server server, SurvivalGame game)
     {
         super(plugin, server, game);
 
-        this.random = new Random();
+        try
+        {
+            this.random = SecureRandom.getInstanceStrong();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();
+            this.random = new Random();
+        }
     }
 
     @Override
@@ -48,7 +59,15 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             SamaGamesAPI.get().getGameManager().setMaxReconnectTime(-1);
 
-            this.rollTeams();
+            try
+            {
+                this.rollTeams();
+            }
+            catch (NoSuchAlgorithmException e)
+            {
+                e.printStackTrace();
+            }
+
             this.createPreTeleportationEvent();
         });
     }
@@ -114,27 +133,37 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         });
     }
 
-    private void rollTeams()
+    private void rollTeams() throws NoSuchAlgorithmException
     {
         SurvivalTeamGame teamGame = ((SurvivalTeamGame<SurvivalGameLoop>) this.game);
         ArrayList<UUID> toMove = new ArrayList<>();
 
         for (SurvivalTeam team : teamGame.getTeams())
         {
-            if (this.random.nextInt(100) > 25)
+            ArrayList<UUID> players = new ArrayList<>();
+
+            for(Map.Entry<UUID, Boolean> entry : team.getPlayersUUID().entrySet())
             {
-                ArrayList<UUID> players = team.getPlayersUUID().keySet().stream().filter(teamMember -> !team.getPlayersUUID().get(teamMember)).collect(Collectors.toCollection(ArrayList::new));
-                players.stream().filter(uuid -> Bukkit.getPlayer(uuid) == null).forEach(players::remove);
+                if(!entry.getValue() && Bukkit.getPlayer(entry.getKey()) != null)
+                    players.add(entry.getKey());
+            }
 
-                if (players.isEmpty())
-                    continue;
+            if (players.isEmpty())
+                continue;
 
-                Collections.shuffle(players, this.random);
+            Collections.shuffle(players, this.random);
 
-                toMove.add(players.get(0));
+            toMove.add(players.get(0));
 
-                if (((SurvivalTeamGame) this.game).getPersonsPerTeam() > 3 && players.size() > 1)
+            if (teamGame.getPersonsPerTeam() > 3 && players.size() > 1)
+            {
+                if(this.random.nextInt(142) == 42)
+                {
+                    Player player = Bukkit.getPlayer(players.get(1));
+                    if(player != null)
+                        player.sendMessage(ChatColor.AQUA  + "" + ChatColor.BOLD+"Bravo! Tu es l'heureux gagnant d'un switch bonus! ");
                     toMove.add(players.get(1));
+                }
             }
         }
 
@@ -153,8 +182,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             UUID two = toMove.get(1);
             Player twoPlayer = Bukkit.getPlayer(two);
 
-            SurvivalTeam oneTeam = ((SurvivalPlayer) this.game.getPlayer(one)).getTeam();
-            SurvivalTeam twoTeam = ((SurvivalPlayer) this.game.getPlayer(two)).getTeam();
+            SurvivalTeam oneTeam = teamGame.getPlayerTeam(one);
+            SurvivalTeam twoTeam = teamGame.getPlayerTeam(two);
 
             oneTeam.removePlayer(one);
             twoTeam.removePlayer(two);
@@ -171,6 +200,12 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             oneLocation.getWorld().strikeLightningEffect(oneLocation);
             twoLocation.getWorld().strikeLightningEffect(twoLocation);
 
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+            {
+                effect(twoLocation);
+                effect(oneLocation);
+            });
+
             onePlayer.teleport(twoLocation);
             twoPlayer.teleport(oneLocation);
 
@@ -180,8 +215,23 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             twoPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 10, 255));
 
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage(ChatColor.YELLOW + "Le joueur " + oneTeam.getChatColor() + onePlayer.getName() + ChatColor.YELLOW + " a échangé sa place avec le joueur " + twoTeam.getChatColor() + twoPlayer.getName() + ChatColor.YELLOW + ".", true);
-
-            Collections.shuffle(toMove, this.random);
         }
+    }
+
+    private void effect(Location loc)
+    {
+        for(double y = loc.getY(); y <= loc.getY()+1.7; y += 0.4)
+        {
+            for(double circle = 0; circle <= Math.PI * 2; circle += 0.6)
+            {
+                double sin = Math.sin(circle);
+                double cos = Math.cos(circle);
+                double x = loc.getX() + sin;
+                double z = loc.getZ() + cos;
+
+                ParticleEffect.PORTAL.display(new Vector(-sin, 0, -cos), 0.5F, new Location(loc.getWorld(), x, y, z), 50);
+            }
+        }
+
     }
 }
