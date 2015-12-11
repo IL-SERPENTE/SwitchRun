@@ -29,9 +29,12 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
     {
         super(plugin, server, game);
 
-        try {
+        try
+        {
             this.random = SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e)
+        {
             e.printStackTrace();
             this.random = new Random();
         }
@@ -56,11 +59,15 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             SamaGamesAPI.get().getGameManager().setMaxReconnectTime(-1);
 
-            try {
+            try
+            {
                 this.rollTeams();
-            } catch (NoSuchAlgorithmException e) {
+            }
+            catch (NoSuchAlgorithmException e)
+            {
                 e.printStackTrace();
             }
+
             this.createPreTeleportationEvent();
         });
     }
@@ -126,7 +133,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         });
     }
 
-    private void rollTeams() throws NoSuchAlgorithmException {
+    private void rollTeams() throws NoSuchAlgorithmException
+    {
         SurvivalTeamGame teamGame = ((SurvivalTeamGame<SurvivalGameLoop>) this.game);
         ArrayList<UUID> toMove = new ArrayList<>();
 
@@ -134,13 +142,10 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         {
             ArrayList<UUID> players = new ArrayList<>();
 
-            //Please no lambda
             for(Map.Entry<UUID, Boolean> entry : team.getPlayersUUID().entrySet())
             {
                 if(!entry.getValue() && Bukkit.getPlayer(entry.getKey()) != null)
-                {
                     players.add(entry.getKey());
-                }
             }
 
             if (players.isEmpty())
@@ -195,8 +200,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             oneLocation.getWorld().strikeLightningEffect(oneLocation);
             twoLocation.getWorld().strikeLightningEffect(twoLocation);
 
-            //Particules
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+            {
                 effect(twoLocation);
                 effect(oneLocation);
             });
@@ -210,9 +215,6 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             twoPlayer.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 10, 255));
 
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage(ChatColor.YELLOW + "Le joueur " + oneTeam.getChatColor() + onePlayer.getName() + ChatColor.YELLOW + " a échangé sa place avec le joueur " + twoTeam.getChatColor() + twoPlayer.getName() + ChatColor.YELLOW + ".", true);
-
-            //useless
-            //Collections.shuffle(toMove, this.random);
         }
     }
 
@@ -220,13 +222,14 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
     {
         for(double y = loc.getY(); y <= loc.getY()+1.7; y += 0.4)
         {
-            for(double cercle = 0; cercle <= Math.PI*2; cercle += 0.6)
+            for(double circle = 0; circle <= Math.PI * 2; circle += 0.6)
             {
-                double sin = Math.sin(cercle);
-                double cos = Math.cos(cercle);
+                double sin = Math.sin(circle);
+                double cos = Math.cos(circle);
                 double x = loc.getX() + sin;
                 double z = loc.getZ() + cos;
-                ParticleEffect.PORTAL.display(new Vector(-sin,0,-cos), 0.5F, new Location(loc.getWorld(), x,y,z), 50);
+
+                ParticleEffect.PORTAL.display(new Vector(-sin, 0, -cos), 0.5F, new Location(loc.getWorld(), x, y, z), 50);
             }
         }
 
