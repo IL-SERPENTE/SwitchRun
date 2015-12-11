@@ -156,8 +156,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             SurvivalTeam oneTeam = ((SurvivalPlayer) this.game.getPlayer(one)).getTeam();
             SurvivalTeam twoTeam = ((SurvivalPlayer) this.game.getPlayer(two)).getTeam();
 
-            oneTeam.remove(one, false);
-            twoTeam.remove(two, false);
+            oneTeam.removePlayer(one);
+            twoTeam.removePlayer(two);
 
             oneTeam.join(two);
             twoTeam.join(one);
