@@ -119,7 +119,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         });
     }
 
-
+    @Override
     public void createTeleportationEvent()
     {
         this.nextEvent = new TimedEvent(3, 0, "Téléportation", ChatColor.YELLOW, false, () ->
@@ -135,7 +135,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
     private void rollTeams() throws NoSuchAlgorithmException
     {
-        SurvivalTeamGame teamGame = ((SurvivalTeamGame<SurvivalGameLoop>) this.game);
+        SurvivalTeamGame teamGame = (SurvivalTeamGame<SurvivalGameLoop>) this.game;
         ArrayList<UUID> toMove = new ArrayList<>();
 
         for (SurvivalTeam team : teamGame.getTeams())
@@ -143,10 +143,8 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
             ArrayList<UUID> players = new ArrayList<>();
 
             for(Map.Entry<UUID, Boolean> entry : team.getPlayersUUID().entrySet())
-            {
                 if(!entry.getValue() && Bukkit.getPlayer(entry.getKey()) != null)
                     players.add(entry.getKey());
-            }
 
             if (players.isEmpty())
                 continue;
@@ -155,15 +153,14 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
 
             toMove.add(players.get(0));
 
-            if (teamGame.getPersonsPerTeam() > 3 && players.size() > 1)
+            if (teamGame.getPersonsPerTeam() > 3 && players.size() > 1 && this.random.nextInt(142) == 42)
             {
-                if(this.random.nextInt(142) == 42)
-                {
-                    Player player = Bukkit.getPlayer(players.get(1));
-                    if(player != null)
-                        player.sendMessage(ChatColor.AQUA  + "" + ChatColor.BOLD+"Bravo! Tu es l'heureux gagnant d'un switch bonus! ");
-                    toMove.add(players.get(1));
-                }
+                Player player = Bukkit.getPlayer(players.get(1));
+
+                if(player != null)
+                    player.sendMessage(ChatColor.AQUA  + "" + ChatColor.BOLD + "Bravo! Tu es l'heureux gagnant d'un switch bonus! ");
+
+                toMove.add(players.get(1));
             }
         }
 
