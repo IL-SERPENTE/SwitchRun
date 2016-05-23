@@ -169,7 +169,7 @@ public class SwitchRunGameLoop extends RunBasedGameLoop
         if (toMove.size() % 2 != 0)
             toMove.remove(0);
 
-        GameUtils.broadcastSound(Sound.ENDERMAN_TELEPORT);
+        GameUtils.broadcastSound(Sound.ENTITY_ENDERMEN_TELEPORT);
 
         while (!toMove.isEmpty())
         {
